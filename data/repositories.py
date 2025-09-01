@@ -1,7 +1,7 @@
 from typing import Optional, List
 from domain.models import CustomerProfile, Product
 from vectorstores.interfaces import VectorStore
-from helpers.product_grouping import dedupe_by_group, interleave_by_category
+from helpers.product_grouping import dedupe_by_group, interleave_by_category, pick_max_per_cat
 from datetime import datetime
 
 class CustomerProfileRepository:
@@ -41,6 +41,7 @@ class ProductCatalogRepository:
         print("time taken to complete the product vector search: ", datetime.now() - current_time)
         current_time = datetime.now()
         products = dedupe_by_group(products)
-        products = interleave_by_category(products, k=k, max_per_cat=30)
+        max_per_cat = pick_max_per_cat(products, k=k, min_total=15)
+        products = interleave_by_category(products, k=k, max_per_cat=max_per_cat)
         print("Time taken to filtering : ", datetime.now() - current_time)
         return products
